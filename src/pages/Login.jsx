@@ -1,8 +1,11 @@
 import React from "react";
 import { useState } from "react";
 import api from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,6 +22,8 @@ function Login() {
     e.preventDefault();
     try {
       const res = await api.post("/auth/login", formData);
+      localStorage.setItem("token", res.data.token);
+      navigate("/dashboard");
       console.log("login success:", res.data);
     } catch (error) {
       console.log("login error:", error.response?.data || error.message);
@@ -47,6 +52,9 @@ function Login() {
         <br />
         <button type="submit"> Login </button>
       </form>
+      <p>
+        Don't have an acoount? <Link to="/register">Register</Link>
+      </p>
     </div>
   );
 }

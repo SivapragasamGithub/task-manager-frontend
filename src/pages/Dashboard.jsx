@@ -2,9 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const [tasks, setTasks] = useState([]);
   const [formData, setFormData] = useState({
@@ -13,13 +15,24 @@ function Dashboard() {
     status: "pending",
   });
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchTasks = async () => {
     try {
+      setLoading(true);
+      setError("");
+
+      // 1.5 sec delay for test slownetwork only not for production
+      // await new Promise((resolve) => setTimeout(resolve, 1500))
+
       const res = await api.get("/tasks");
       setTasks(res.data);
     } catch (error) {
-      console.log(error.response?.data || error.message);
+      // console.log(error.response?.data || error.message);
+      setError(error.response?.data?.message || "Failed to load tasks");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +65,8 @@ function Dashboard() {
       });
       fetchTasks();
     } catch (error) {
-      console.log(error.response?.data || error.message);
+      // console.log(error.response?.data || error.message);
+      setError(error.response?.data?.message || "Task save Failed");
     }
   };
 
@@ -70,12 +84,14 @@ function Dashboard() {
       await api.delete(`/tasks/${id}`);
       fetchTasks();
     } catch (error) {
-      console.log(error.response?.data || error.message);
+      // console.log(error.response?.data || error.message);
+      setError(error.response?.data?.message || "Task delete Failed");
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
+    logout();
     navigate("/login");
   };
 
@@ -134,7 +150,9 @@ function Dashboard() {
 
       <h2>My Tasks</h2>
 
-      {tasks.length === 0 ? (
+      {loading ? (
+        <p>Loading Taks... </p>
+      ) : tasks.length === 0 ? (
         <p>No Tasks Found</p>
       ) : (
         tasks.map((task) => (

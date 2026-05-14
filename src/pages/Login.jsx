@@ -2,9 +2,11 @@ import React from "react";
 import { useState } from "react";
 import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -22,7 +24,8 @@ function Login() {
     e.preventDefault();
     try {
       const res = await api.post("/auth/login", formData);
-      localStorage.setItem("token", res.data.token);
+      // localStorage.setItem("token", res.data.token);
+      login(res.data.token);
       navigate("/dashboard");
       console.log("login success:", res.data);
     } catch (error) {

@@ -96,13 +96,16 @@ function Dashboard() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h5>Dashboard </h5>
       <button onClick={handleLogout}>Logout</button>
 
       <hr />
 
       <h2>{editingTaskId ? "Edit Task" : "Create Task"}</h2>
+
+      {error && <p className="error">{error}</p>}
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -156,13 +159,15 @@ function Dashboard() {
         <p>No Tasks Found</p>
       ) : (
         tasks.map((task) => (
-          <div key={task._id}>
+          <div key={task._id} className="task-card">
             <h3>{task.title} </h3>
             <p>{task.description}</p>
             <p>Status:{task.status}</p>
-            <button onClick={() => handleEdit(task)}>Edit</button>
-            <button onClick={() => handleDelete(task._id)}>Delete</button>
 
+            <div className="task-actions">
+              <button onClick={() => handleEdit(task)}>Edit</button>
+              <button onClick={() => handleDelete(task._id)}>Delete</button>
+            </div>
             <hr />
           </div>
         ))

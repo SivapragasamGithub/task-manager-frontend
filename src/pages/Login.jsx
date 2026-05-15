@@ -13,6 +13,8 @@ function Login() {
     password: "",
   });
 
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,19 +25,24 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setError("");
       const res = await api.post("/auth/login", formData);
       // localStorage.setItem("token", res.data.token);
       login(res.data.token);
       navigate("/dashboard");
       console.log("login success:", res.data);
     } catch (error) {
-      console.log("login error:", error.response?.data || error.message);
+      // console.log("login error:", error.response?.data || error.message);
+      setError(error.response?.data?.message || "Login Failed");
     }
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>Login</h1>
+
+      {error && <p className="error">{error}</p>}
+
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -55,7 +62,7 @@ function Login() {
         <br />
         <button type="submit"> Login </button>
       </form>
-      <p>
+      <p style={{ marginTop: "15px" }}>
         Don't have an acoount? <Link to="/register">Register</Link>
       </p>
     </div>

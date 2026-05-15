@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import api from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const navigate = useNavigate();
@@ -11,6 +11,8 @@ function Register() {
     email: "",
     password: "",
   });
+
+  const [error, setError] = useState("");
 
   const handlechange = (e) => {
     setFormData((prev) => ({
@@ -22,19 +24,24 @@ function Register() {
   const handlesubmit = async (e) => {
     e.preventDefault();
     try {
+      setError("");
+
       const res = await api.post("/auth/register", formData);
 
       console.log("Register Success:", res.data);
 
       navigate("/login");
     } catch (error) {
-      console.log("Register error:", error.response?.data || error.message);
+      // console.log("Register error:", error.response?.data || error.message);
+      setError(error.response?.data?.message || "Register Failed");
     }
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>Register</h1>
+
+      {error && <p className="error">{error}</p>}
 
       <form onSubmit={handlesubmit}>
         <input
@@ -65,6 +72,9 @@ function Register() {
 
         <button type="submit"> Register </button>
       </form>
+      <p style={{ marginTop: "15px" }}>
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
     </div>
   );
 }
